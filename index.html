@@ -63,8 +63,8 @@ var path = sankey.link();
 d3.json("sankey.json", function(error, graph) {
 
   sankey
-      .nodes(graph.nodes)
-      .links(graph.links)
+      .nodes(graph.nodes) // this will add more properties to graph.nodes, such as dy, x, y etc
+      .links(graph.links) // this will add more properties to graph.links, such as dy, x, y etc
       .layout(32);
 
 // add in the links
@@ -79,7 +79,7 @@ d3.json("sankey.json", function(error, graph) {
 // add the link titles
   link.append("title")
         .text(function(d) {
-    		return d.source.name + " → " + 
+    		return d.source.name + " → " + // use ALT + 26 to keyin →
                 d.target.name + "\n" + format(d.value); });
 
 // add in the nodes
@@ -101,9 +101,9 @@ d3.json("sankey.json", function(error, graph) {
 // add the rectangles for the nodes
   node.append("rect")
       .attr("height", function(d) { return d.dy; })
-      .attr("width", sankey.nodeWidth())
+      .attr("width", sankey.nodeWidth()) // equivalent to function(d) {return d.dx;}
       .style("fill", function(d) { 
-		  return d.color = color(d.name.replace(/ .*/, "")); })
+		  return d.color = color(d.name.replace(/ .*/, "")); }) // remove the space and all the characters behind
       .style("stroke", function(d) { 
 		  return d3.rgb(d.color).darker(2); })
     .append("title")
@@ -118,7 +118,7 @@ d3.json("sankey.json", function(error, graph) {
       .attr("text-anchor", "end")
       .attr("transform", null)
       .text(function(d) { return d.name; })
-    .filter(function(d) { return d.x < width / 2; })
+    .filter(function(d) { return d.x < width / 2; }) // alter the setting based on the x location
       .attr("x", 6 + sankey.nodeWidth())
       .attr("text-anchor", "start");
 
@@ -127,12 +127,14 @@ d3.json("sankey.json", function(error, graph) {
     d3.select(this)
       .attr("transform", 
             "translate(" 
-               + d.x + "," 
+               + (d.x = Math.max(
+                  0, Math.min(width - d.dx, d3.event.x))
+                 ) + "," 
                + (d.y = Math.max(
                   0, Math.min(height - d.dy, d3.event.y))
                  ) + ")");
-    sankey.relayout();
-    link.attr("d", path);
+    sankey.relayout(); // redraw the link
+    link.attr("d", path); // redraw the link
   }
 });
 
