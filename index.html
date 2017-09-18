@@ -60,7 +60,17 @@ var sankey = d3.sankey()
 var path = sankey.link();
 
 // load the data
-d3.json("sankey.json", function(error, graph) {
+d3.json("sankey-names.json", function(error, graph) {
+
+  var nodeMap = {};
+  graph.nodes.forEach(function(x) { nodeMap[x.name] = x; });
+  graph.links = graph.links.map(function(x) { //The map() method creates a new array with the results of calling a provided function on every element in this array.
+    return {
+      source: nodeMap[x.source],
+      target: nodeMap[x.target],
+      value: x.value
+    };
+  });
 
   sankey
       .nodes(graph.nodes) // this will add more properties to graph.nodes, such as dy, x, y etc
